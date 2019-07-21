@@ -20,6 +20,8 @@ def log(text=""):
 def Follow(post):
     text = post.text
 
+    log("info: follow user : "+post.user.screen_name)
+
     if "follow" in text.lower():
         try:
             api.CreateFriendship(user_id=post.user.id)
@@ -30,12 +32,14 @@ def Follow(post):
 def Retweet(post):
     text = post.text
 
-    if ["rt", "retweet"] in text.lower():
+    log("info: retweet starting: " + str(post.id) + " from user " + post.user.screen_name)
+
+    if any(x in text.lower() for x in ["rt", "retweet"]):
         try:
             api.PostRetweet(status_id=post.id)
-            log("success: retweet tweet: " + post.id + " from user " + post.user.screen_name)
+            log("success: retweet tweet: " + str(post.id) + " from user " + post.user.screen_name)
         except:
-            log("error: Cannot retweet tweet: "+post.id+" from user "+post.user.screen_name)
+            log("error: Cannot retweet tweet: "+str(post.id)+" from user "+post.user.screen_name)
 
 #file to ignore contest that you already participate to
 def ReadIgnoreFile():
@@ -55,18 +59,17 @@ def ReadIgnoreFile():
 
     return json
 
-def WriteIgnoreFile(post):
+def WriteIgnoreFile(content):
     filename = config.IGNORE_PATH
 
     log("info: write ignore file")
 
     if not os.path.exists(filename):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
-        file = open(filename, "w+")
-    else:
-        file = open(filename, "a+")
 
-    file.write()
+    file = open(filename, "w+")
+
+    file.write(content)
     file.close()
 
     log("success: write ignore file done")
@@ -83,7 +86,7 @@ try:
                       consumer_secret=config.CONSUMER_SECRET,
                       access_token_key=config.ACCESS_TOKEN,
                       access_token_secret=config.ACCESS_TOKEN_SECRET)
-    log("sucess: successfully contact the API")
+    log("success: successfully contact the API")
 except:
     log("error: cannot contact the API")
 
@@ -94,7 +97,7 @@ for tweet in list:
         Follow(tweet)
         Retweet(tweet)
 
-ignore_list_string = JSON.dump(ignore_list)
+ignore_list_string = JSON.dumps(ignore_list)
 WriteIgnoreFile(ignore_list_string)
 
 log("sucess: work is done")
