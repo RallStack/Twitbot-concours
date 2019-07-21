@@ -52,6 +52,18 @@ def Fav(post):
         except:
             log("error: Cannot fav tweet: "+str(post.id)+" from user "+post.user.screen_name)
 
+def Identify(post):
+    text = post.full_text
+
+    log("info: Identify starting: " + str(post.id) + " from user " + post.user.screen_name)
+
+    if any(x in text.lower() for x in ["Identifie", "tag", "identifier", "indentidiez"]):
+        try:
+            api.PostUpdate(status="@RallStack",in_reply_to_status_id=post.id,auto_populate_reply_metadata=True, )
+            log("success: Identify tweet: " + str(post.id) + " from user " + post.user.screen_name)
+        except:
+            log("error: Cannot identify tweet: "+str(post.id)+" from user "+post.user.screen_name)
+
 #file to ignore contest that you already participate to
 def ReadIgnoreFile():
     filename = config.IGNORE_PATH
@@ -116,6 +128,7 @@ for tweet in list:
         Follow(x)
         Retweet(x)
         Fav(x)
+        Identify(x)
 
 ignore_list_string = JSON.dumps(ignore_list)
 WriteIgnoreFile(ignore_list_string)
