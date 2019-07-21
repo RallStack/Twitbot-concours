@@ -1,6 +1,7 @@
 import twitter
 import config
 import datetime
+import json as JSON
 import os
 
 def log(text=""):
@@ -36,6 +37,39 @@ def Retweet(post):
         except:
             log("error: Cannot retweet tweet: "+post.id+" from user "+post.user.screen_name)
 
+#file to ignore contest that you already participate to
+def ReadIgnoreFile():
+    filename = config.IGNORE_PATH
+
+    if os.path.exists(filename):
+        file = open(filename, "r")
+    else:
+        file = open(filename, "w+")
+
+    json = file.read()
+    file.close()
+
+    return json
+
+def WriteIgnoreFile(post):
+    filename = config.IGNORE_PATH
+
+    if not os.path.exists(filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        file = open(filename, "w+")
+    else:
+        file = open(filename, "a+")
+
+    file.write()
+    file.close()
+
+log("info: script is  starting")
+
+json = ReadIgnoreFile()
+ignore_list = list()
+if json:
+    ignore_list = JSON.loads(json)
+
 try:
     api = twitter.Api(consumer_key=config.CONSUMER_KEY,
                       consumer_secret=config.CONSUMER_SECRET,
@@ -44,5 +78,6 @@ try:
     log("sucess: successfully contact the API")
 except:
     log("error: cannot contact the API")
-
-list = api.GetSearch(term=config.TERMS, count=25, lang=config.LANG)
+#
+# list = api.GetSearch(term=config.TERMS, count=5, lang=config.LANG)
+# for tweet in list:
