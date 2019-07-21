@@ -40,6 +40,18 @@ def Retweet(post):
         except:
             log("error: Cannot retweet tweet: "+str(post.id)+" from user "+post.user.screen_name)
 
+def Fav(post):
+    text = post.full_text
+
+    log("info: Fav starting: " + str(post.id) + " from user " + post.user.screen_name)
+
+    if any(x in text.lower() for x in ["fav", "like", "coeur"]):
+        try:
+            api.CreateFavorite(status_id=post.id)
+            log("success: Fav tweet: " + str(post.id) + " from user " + post.user.screen_name)
+        except:
+            log("error: Cannot fav tweet: "+str(post.id)+" from user "+post.user.screen_name)
+
 #file to ignore contest that you already participate to
 def ReadIgnoreFile():
     filename = config.IGNORE_PATH
