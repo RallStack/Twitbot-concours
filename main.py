@@ -14,7 +14,7 @@ def log(text=""):
     else:
         file = open(filename, "a+")
 
-    file.write(str(date.hour)+':'+str(date.minute)+':'+str(date.second)+' | '+text)
+    file.write(str(date.hour)+':'+str(date.minute)+':'+str(date.second)+' | '+text+'\n')
     file.close()
 
 def Follow(post):
