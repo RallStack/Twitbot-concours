@@ -17,10 +17,20 @@ def log(text=""):
 def Follow(post):
     text = post.text
 
-    if "follow" in text:
+    if "follow" in text.lower():
         try:
             api.CreateFriendship(user_id=post.user.id)
         except:
             log("error: cannot follow user : "+post.user.screen_name)
+
+def Retweet(post):
+    text = post.text
+
+    if ["rt", "retweet"] in text.lower():
+        try:
+            api.PostRetweet(status_id=post.id)
+            log("success: retweet tweet: " + post.id + " from user " + post.user.screen_name)
+        except:
+            log("error: Cannot retweet tweet: "+post.id+" from user "+post.user.screen_name)
 
 list = api.GetSearch(term="RT et follow", count=25, lang="fr")
