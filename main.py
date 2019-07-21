@@ -18,19 +18,18 @@ def log(text=""):
     file.close()
 
 def Follow(post):
-    text = post.text
+    text = post.full_text
 
     log("info: follow user : "+post.user.screen_name)
 
-    if "follow" in text.lower():
-        try:
-            api.CreateFriendship(user_id=post.user.id)
-            log("success: follow user : "+post.user.screen_name)
-        except:
-            log("error: cannot follow user : "+post.user.screen_name)
+    try:
+        api.CreateFriendship(user_id=post.user.id)
+        log("success: follow user : "+post.user.screen_name)
+    except:
+        log("error: cannot follow user : "+post.user.screen_name)
 
 def Retweet(post):
-    text = post.text
+    text = post.full_text
 
     log("info: retweet starting: " + str(post.id) + " from user " + post.user.screen_name)
 
@@ -85,17 +84,25 @@ try:
     api = twitter.Api(consumer_key=config.CONSUMER_KEY,
                       consumer_secret=config.CONSUMER_SECRET,
                       access_token_key=config.ACCESS_TOKEN,
-                      access_token_secret=config.ACCESS_TOKEN_SECRET)
+                      access_token_secret=config.ACCESS_TOKEN_SECRET,
+                      cache=None,
+                      tweet_mode='extended')
+
     log("success: successfully contact the API")
 except:
     log("error: cannot contact the API")
 
 list = api.GetSearch(term=config.TERMS, count=5, lang=config.LANG)
 for tweet in list:
-    if tweet.id not in ignore_list:
-        ignore_list.append(tweet.id)
-        Follow(tweet)
-        Retweet(tweet)
+    if tweet.retweeted_status:
+        x = tweet.retweeted_status
+    else:
+        x = tweet
+
+    if x.id not in ignore_list:
+        ignore_list.append(x.id)
+        Follow(x)
+        Retweet(x)
 
 ignore_list_string = JSON.dumps(ignore_list)
 WriteIgnoreFile(ignore_list_string)
