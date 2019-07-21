@@ -1,17 +1,19 @@
 import twitter
 import config
 import datetime
-
-api = twitter.Api(consumer_key=config.CONSUMER_KEY,
-                  consumer_secret=config.CONSUMER_SECRET,
-                  access_token_key=config.ACCESS_TOKEN,
-                  access_token_secret=config.ACCESS_TOKEN_SECRET)
+import os
 
 def log(text=""):
     date = datetime.datetime.now()
+    filename = config.LOG_PATH+str(date.year)+'_'+str(date.month)+'_'+str(date.day)
 
-    file = open(config.LOG_PATH+date.year+'_'+date.month+'_'+date.day, "a+")
-    file.write(date.hour+':'+date.minute+':'+date.second+' | '+text)
+    if not os.path.exists(filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        file = open(filename, "w+")
+    else:
+        file = open(filename, "a+")
+
+    file.write(str(date.hour)+':'+str(date.minute)+':'+str(date.second)+' | '+text)
     file.close()
 
 def Follow(post):
@@ -34,4 +36,13 @@ def Retweet(post):
         except:
             log("error: Cannot retweet tweet: "+post.id+" from user "+post.user.screen_name)
 
-list = api.GetSearch(term="RT et follow", count=25, lang="fr")
+try:
+    api = twitter.Api(consumer_key=config.CONSUMER_KEY,
+                      consumer_secret=config.CONSUMER_SECRET,
+                      access_token_key=config.ACCESS_TOKEN,
+                      access_token_secret=config.ACCESS_TOKEN_SECRET)
+    log("sucess: successfully contact the API")
+except:
+    log("error: cannot contact the API")
+
+list = api.GetSearch(term=config.TERMS, count=25, lang=config.LANG)
