@@ -41,6 +41,8 @@ def Retweet(post):
 def ReadIgnoreFile():
     filename = config.IGNORE_PATH
 
+    log("info: read ignore file")
+
     if os.path.exists(filename):
         file = open(filename, "r")
     else:
@@ -49,10 +51,14 @@ def ReadIgnoreFile():
     json = file.read()
     file.close()
 
+    log("success: read ignore file done")
+
     return json
 
 def WriteIgnoreFile(post):
     filename = config.IGNORE_PATH
+
+    log("info: write ignore file")
 
     if not os.path.exists(filename):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -63,10 +69,12 @@ def WriteIgnoreFile(post):
     file.write()
     file.close()
 
+    log("success: write ignore file done")
+
 log("info: script is  starting")
 
 json = ReadIgnoreFile()
-ignore_list = list()
+ignore_list = []
 if json:
     ignore_list = JSON.loads(json)
 
@@ -78,6 +86,15 @@ try:
     log("sucess: successfully contact the API")
 except:
     log("error: cannot contact the API")
-#
-# list = api.GetSearch(term=config.TERMS, count=5, lang=config.LANG)
-# for tweet in list:
+
+list = api.GetSearch(term=config.TERMS, count=5, lang=config.LANG)
+for tweet in list:
+    if tweet.id not in ignore_list:
+        ignore_list.append(tweet.id)
+        Follow(tweet)
+        Retweet(tweet)
+
+ignore_list_string = JSON.dump(ignore_list)
+WriteIgnoreFile(ignore_list_string)
+
+log("sucess: work is done")
