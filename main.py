@@ -11,7 +11,7 @@ def log(text=""):
     date = datetime.datetime.now()
 
     file = open(config.LOG_PATH+date.year+'_'+date.month+'_'+date.day, "a+")
-    file.write(text)
+    file.write(date.hour+':'+date.minute+':'+date.second+' | '+text)
     file.close()
 
 def Follow(post):
