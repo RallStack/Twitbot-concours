@@ -1,1 +1,5 @@
+# exclude idea folder project
+.idea
+
+# exclude config.py which contain API key
 config.py
