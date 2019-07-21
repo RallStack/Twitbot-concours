@@ -20,6 +20,7 @@ def Follow(post):
     if "follow" in text.lower():
         try:
             api.CreateFriendship(user_id=post.user.id)
+            log("success: follow user : "+post.user.screen_name)
         except:
             log("error: cannot follow user : "+post.user.screen_name)
 
