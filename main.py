@@ -115,6 +115,7 @@ for tweet in list:
         ignore_list.append(x.id)
         Follow(x)
         Retweet(x)
+        Fav(x)
 
 ignore_list_string = JSON.dumps(ignore_list)
 WriteIgnoreFile(ignore_list_string)
