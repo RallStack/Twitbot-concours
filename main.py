@@ -33,7 +33,7 @@ def Retweet(post):
 
     log("info: retweet starting: " + str(post.id) + " from user " + post.user.screen_name)
 
-    if any(x in text.lower() for x in ["rt", "retweet"]):
+    if any(x in text.lower() for x in config.RT_LIST):
         try:
             api.PostRetweet(status_id=post.id)
             log("success: retweet tweet: " + str(post.id) + " from user " + post.user.screen_name)
@@ -45,7 +45,7 @@ def Fav(post):
 
     log("info: Fav starting: " + str(post.id) + " from user " + post.user.screen_name)
 
-    if any(x in text.lower() for x in ["fav", "like", "coeur"]):
+    if any(x in text.lower() for x in config.FAV_LIST):
         try:
             api.CreateFavorite(status_id=post.id)
             log("success: Fav tweet: " + str(post.id) + " from user " + post.user.screen_name)
@@ -57,7 +57,7 @@ def Identify(post):
 
     log("info: Identify starting: " + str(post.id) + " from user " + post.user.screen_name)
 
-    if any(x in text.lower() for x in ["Identifie", "tag", "identifier", "indentidiez"]):
+    if any(x in text.lower() for x in config.IDENTIFY_LIST):
         try:
             api.PostUpdate(status="@RallStack",in_reply_to_status_id=post.id,auto_populate_reply_metadata=True, )
             log("success: Identify tweet: " + str(post.id) + " from user " + post.user.screen_name)
@@ -116,19 +116,25 @@ try:
 except:
     log("error: cannot contact the API")
 
-list = api.GetSearch(term=config.TERMS, count=5, lang=config.LANG)
+count = 0
+
+list = api.GetSearch(term=config.TERMS, count=config.SEARCH_CONTER, lang=config.LANG)
 for tweet in list:
     if tweet.retweeted_status:
         x = tweet.retweeted_status
     else:
         x = tweet
 
-    if x.id not in ignore_list:
+    if x.id not in ignore_list and not any(x in x.full_text.lower() for x in config.BAN_WORDS):
         ignore_list.append(x.id)
         Follow(x)
         Retweet(x)
         Fav(x)
         Identify(x)
+        count += 1
+
+    if count == config.RT_PER_SESSION:
+        break
 
 ignore_list_string = JSON.dumps(ignore_list)
 WriteIgnoreFile(ignore_list_string)
