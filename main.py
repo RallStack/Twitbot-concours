@@ -3,6 +3,7 @@ import config
 import datetime
 import json as JSON
 import os
+import time
 
 def log(text=""):
     date = datetime.datetime.now()
@@ -27,6 +28,9 @@ def Follow(post):
         log("success: follow user : "+post.user.screen_name)
     except:
         log("error: cannot follow user : "+post.user.screen_name)
+
+    for user in post.user_mentions:
+        api.CreateFriendship(user_id=user.id)
 
 def Retweet(post):
     text = post.full_text
@@ -118,25 +122,27 @@ except:
 
 count = 0
 
-list = api.GetSearch(term=config.TERMS, count=config.SEARCH_CONTER, lang=config.LANG)
-for tweet in list:
-    if tweet.retweeted_status:
-        post = tweet.retweeted_status
-    else:
-        post = tweet
+while count < 4:
+    list = api.GetSearch(term=config.TERMS, count=config.SEARCH_CONTER, lang=config.LANG)
+    for tweet in list:
+        if tweet.retweeted_status:
+            post = tweet.retweeted_status
+        else:
+            post = tweet
 
-    if post.id not in ignore_list and not any(x in post.full_text.lower() for x in config.BAN_WORDS):
-        ignore_list.append(post.id)
-        Follow(post)
-        Retweet(post)
-        Fav(post)
-        Identify(post)
-        count += 1
+        if post.id not in ignore_list:
+            if not any(x in post.full_text.lower() for x in config.BAN_WORDS):
+                ignore_list.append(post.id)
+                Follow(post)
+                Retweet(post)
+                Fav(post)
+                Identify(post)
+                time.sleep(30)
 
-    if count == config.RT_PER_SESSION:
-        break
+    count += 1
 
-ignore_list_string = JSON.dumps(ignore_list)
-WriteIgnoreFile(ignore_list_string)
+
+    ignore_list_string = JSON.dumps(ignore_list)
+    WriteIgnoreFile(ignore_list_string)
 
 log("sucess: work is done")
