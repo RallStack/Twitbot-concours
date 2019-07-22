@@ -25,9 +25,9 @@ def Follow(post):
 
     try:
         api.CreateFriendship(user_id=post.user.id)
-        log("success: follow user : "+post.user.screen_name)
-    except:
-        log("error: cannot follow user : "+post.user.screen_name)
+        log("success: follow user")
+    except Exception as e:
+        log("error:"+str(e))
 
     for user in post.user_mentions:
         api.CreateFriendship(user_id=user.id)
@@ -40,9 +40,9 @@ def Retweet(post):
     if any(x in text.lower() for x in config.RT_LIST):
         try:
             api.PostRetweet(status_id=post.id)
-            log("success: retweet tweet: " + str(post.id) + " from user " + post.user.screen_name)
-        except:
-            log("error: Cannot retweet tweet: "+str(post.id)+" from user "+post.user.screen_name)
+            log("success: retweet tweet")
+        except Exception as e:
+            log("error:"+str(e))
 
 def Fav(post):
     text = post.full_text
@@ -52,9 +52,9 @@ def Fav(post):
     if any(x in text.lower() for x in config.FAV_LIST):
         try:
             api.CreateFavorite(status_id=post.id)
-            log("success: Fav tweet: " + str(post.id) + " from user " + post.user.screen_name)
-        except:
-            log("error: Cannot fav tweet: "+str(post.id)+" from user "+post.user.screen_name)
+            log("success: Fav tweet")
+        except Exception as e:
+            log("error:"+str(e))
 
 def Identify(post):
     text = post.full_text
@@ -64,9 +64,9 @@ def Identify(post):
     if any(x in text.lower() for x in config.IDENTIFY_LIST):
         try:
             api.PostUpdate(status="@RallStack",in_reply_to_status_id=post.id,auto_populate_reply_metadata=True, )
-            log("success: Identify tweet: " + str(post.id) + " from user " + post.user.screen_name)
-        except:
-            log("error: Cannot identify tweet: "+str(post.id)+" from user "+post.user.screen_name)
+            log("success: Identify tweet")
+        except Exception as e:
+            log("error:"+str(e))
 
 #file to ignore contest that you already participate to
 def ReadIgnoreFile():
@@ -117,8 +117,8 @@ try:
                       tweet_mode='extended')
 
     log("success: successfully contact the API")
-except:
-    log("error: cannot contact the API")
+except Exception as e:
+    log("error:"+str(e))
 
 count = 0
 
