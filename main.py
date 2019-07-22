@@ -121,16 +121,16 @@ count = 0
 list = api.GetSearch(term=config.TERMS, count=config.SEARCH_CONTER, lang=config.LANG)
 for tweet in list:
     if tweet.retweeted_status:
-        x = tweet.retweeted_status
+        post = tweet.retweeted_status
     else:
-        x = tweet
+        post = tweet
 
-    if x.id not in ignore_list and not any(x in x.full_text.lower() for x in config.BAN_WORDS):
-        ignore_list.append(x.id)
-        Follow(x)
-        Retweet(x)
-        Fav(x)
-        Identify(x)
+    if post.id not in ignore_list and not any(x in post.full_text.lower() for x in config.BAN_WORDS):
+        ignore_list.append(post.id)
+        Follow(post)
+        Retweet(post)
+        Fav(post)
+        Identify(post)
         count += 1
 
     if count == config.RT_PER_SESSION:
